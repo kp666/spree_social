@@ -14,7 +14,7 @@ Spree::User.class_eval do
       self.user_authentications.create!(:provider => source['provider'],
         :uid => source['uid'], :nickname => source["user_info"]['nickname'],
         :access_token =>source["credentials"]["token"],
-        :user_name =>["extra"]["user_hash"]["username"]
+        :user_name =>source["extra"]["user_hash"]["username"]
       )
     end
 
