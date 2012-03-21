@@ -35,16 +35,13 @@ class Spree::OmniauthCallbacksController < Devise::OmniauthCallbacksController
     else # adding a social source
       user = current_user
     end
-
     user ||= Spree::User.anonymous!
-
-    user.associate_auth(omniauth) unless existing_auth
-
+    user.associate_auth(omniauth)
     if current_order
       current_order.associate_user!(user)
       session[:guest_token] = nil
     end
-
+    session[:name] = omniauth["user_info"]["name"]
     if user.anonymous?
       session[:user_access_token] = user.token #set user access token so we can edit this user again later
 
