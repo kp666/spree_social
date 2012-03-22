@@ -19,7 +19,7 @@ class Spree::OmniauthCallbacksController < Devise::OmniauthCallbacksController
   private
 
   def social_setup(provider)
-   p omniauth = request.env["omniauth.auth"]
+    p omniauth = request.env["omniauth.auth"]
 
     if request.env["omniauth.error"].present?
       flash[:error] = I18n.t("devise.omniauth_callbacks.failure", :kind => provider, :reason => I18n.t(:reason_user_was_not_valid))
@@ -35,6 +35,7 @@ class Spree::OmniauthCallbacksController < Devise::OmniauthCallbacksController
     else # adding a social source
       user = current_user
     end
+  
     user ||= Spree::User.anonymous!
     user.associate_auth(omniauth)
     if current_order
