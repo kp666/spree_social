@@ -19,7 +19,7 @@ class Spree::OmniauthCallbacksController < Devise::OmniauthCallbacksController
   private
 
   def social_setup(provider)
-    omniauth = request.env["omniauth.auth"]
+   p omniauth = request.env["omniauth.auth"]
 
     if request.env["omniauth.error"].present?
       flash[:error] = I18n.t("devise.omniauth_callbacks.failure", :kind => provider, :reason => I18n.t(:reason_user_was_not_valid))
@@ -44,9 +44,11 @@ class Spree::OmniauthCallbacksController < Devise::OmniauthCallbacksController
     session[:name] = omniauth["user_info"]["name"]
     if user.anonymous?
       session[:user_access_token] = user.token #set user access token so we can edit this user again later
-
-      flash.now[:notice] = t("one_more_step", :kind => omniauth['provider'].capitalize)
-      render(:template => "spree/user_registrations/social_edit", :locals => {:user => user, :omniauth => omniauth})
+      user.email = omniauth["extra"]["user_hash"]["email"]
+      user.save
+      sign_in_and_redirect(user, :event => :authentication)
+     # flash.now[:notice] = t("one_more_step", :kind => omniauth['provider'].capitalize)
+     # render(:template => "spree/user_registrations/social_edit", :locals => {:user => user, :omniauth => omniauth})
     elsif current_user
       flash[:error] = t("attach_error", :kind => omniauth['provider'].capitalize) if existing_auth && (existing_auth.user != current_user)
       redirect_back_or_default(account_url)

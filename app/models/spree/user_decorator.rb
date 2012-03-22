@@ -8,13 +8,19 @@ Spree::User.class_eval do
     user_authentication = user_authentications.where(:provider => source['provider'], :uid => source['uid'].to_s).first rescue nil
     self.provider = source['provider']
     if user_authentication
-      user_authentication.update_attributes(:access_token => source["credentials"]["token"],:user_name => source["extra"]["user_hash"]["username"])
+      user_authentication.update_attributes(
+        :access_token => source["credentials"]["token"],
+        :user_name => source["extra"]["user_hash"]["username"],
+        :name => source["extra"]["user_hash"]["name"],
+        :gender=> source["extra"]["user_hash"]["gender"]
+      )
       return
     else
       self.user_authentications.create!(:provider => source['provider'],
         :uid => source['uid'], :nickname => source["user_info"]['nickname'],
         :access_token =>source["credentials"]["token"],
-        :user_name =>source["extra"]["user_hash"]["username"]
+        :name => source["extra"]["user_hash"]["name"],
+        :gender=> source["extra"]["user_hash"]["gender"]
       )
     end
 
