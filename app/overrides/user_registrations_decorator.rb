@@ -1,8 +1,3 @@
-Deface::Override.new(:virtual_path => "spree/user_registrations/new",
-                     :name => "add_socials_to_login_extras",
-                     :insert_after => "[data-hook='login_extras']",
-                     :partial => "spree/shared/socials",
-                     :disabled => false)
 
 Deface::Override.new(:virtual_path => "spree/user_registrations/new",
                      :name => "add_omni_auth_to_signup_inside_form",
