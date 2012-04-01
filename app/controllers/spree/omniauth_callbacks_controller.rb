@@ -17,16 +17,23 @@ class Spree::OmniauthCallbacksController < Devise::OmniauthCallbacksController
   end
 
   private
+   def anonymise!(source)
+      token = Spree::User.generate_token(:persistence_token)
+      user = Spree::User.find_by_email(source["extra"]["user_hash"]["email"]) rescue nil
+      unless user
+        Spree::User.create(:email => "#{token}@example.net", :password => token, :password_confirmation => token, :persistence_token => token)
+      else
+        user
+      end
+    end
 
   def social_setup(provider)
-    p omniauth = request.env["omniauth.auth"]
-
+     omniauth = request.env["omniauth.auth"]
     if request.env["omniauth.error"].present?
       flash[:error] = I18n.t("devise.omniauth_callbacks.failure", :kind => provider, :reason => I18n.t(:reason_user_was_not_valid))
       redirect_back_or_default(root_url)
       return
     end
-
     existing_auth = Spree::UserAuthentication.where(:provider => omniauth['provider'], :uid => omniauth['uid'].to_s).first
 
     #signing back in from a social source
@@ -35,8 +42,7 @@ class Spree::OmniauthCallbacksController < Devise::OmniauthCallbacksController
     else # adding a social source
       user = current_user
     end
-  
-    user ||= Spree::User.anonymous!
+    user ||= anonymise!(omniauth)
     user.associate_auth(omniauth)
     if current_order
       current_order.associate_user!(user)
